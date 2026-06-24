@@ -9,13 +9,14 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-if (Environment.GetEnvironmentVariable("PORT") != null)
+if (Environment.GetEnvironmentVariable("PORT") != null || Environment.GetEnvironmentVariable("RAILWAY_ENVIRONMENT") != null)
 {
-    // If running on Railway/Cloud, use /tmp to ensure we have write permissions
     connectionString = "Data Source=/tmp/glasscollector.db";
-    var port = Environment.GetEnvironmentVariable("PORT");
-    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 }
+
+var envPort = Environment.GetEnvironmentVariable("PORT");
+var portString = string.IsNullOrEmpty(envPort) ? "" : $"http://0.0.0.0:{envPort}";
+builder.WebHost.UseUrls("http://0.0.0.0:8080", "http://0.0.0.0:3000", "http://0.0.0.0:5000", portString);
 
 builder.Services.AddDbContext<GlassCollectorDbContext>(options =>
     options.UseSqlite(connectionString));
