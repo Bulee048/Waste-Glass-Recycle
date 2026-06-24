@@ -198,4 +198,15 @@ public class TripsController : ControllerBase
         _db.TripStops.AddRange(tripStops);
         await _db.SaveChangesAsync();
     }
+
+    [HttpPost("reset")]
+    public async Task<IActionResult> ResetData()
+    {
+        _db.TripStops.RemoveRange(_db.TripStops);
+        _db.Trips.RemoveRange(_db.Trips);
+        _db.Suppliers.RemoveRange(_db.Suppliers);
+        await _db.SaveChangesAsync();
+        await DatabaseSeeder.SeedAsync(_db);
+        return Ok(new { message = "Database successfully wiped and re-seeded! You can now start a fresh demo." });
+    }
 }
