@@ -4,7 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.UseUrls("http://localhost:5000", "https://localhost:5001");
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -50,6 +51,7 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<GlassCollectorDbContext>();
+    db.Database.Migrate();
     await DatabaseSeeder.SeedAsync(db);
 }
 
