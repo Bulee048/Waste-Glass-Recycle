@@ -14,10 +14,6 @@ if (Environment.GetEnvironmentVariable("PORT") != null || Environment.GetEnviron
     connectionString = "Data Source=/tmp/glasscollector.db";
 }
 
-var envPort = Environment.GetEnvironmentVariable("PORT");
-var portString = string.IsNullOrEmpty(envPort) ? "" : $"http://0.0.0.0:{envPort}";
-builder.WebHost.UseUrls("http://0.0.0.0:8080", "http://0.0.0.0:3000", "http://0.0.0.0:5000", portString);
-
 builder.Services.AddDbContext<GlassCollectorDbContext>(options =>
     options.UseSqlite(connectionString));
 
