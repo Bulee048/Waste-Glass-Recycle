@@ -8,8 +8,15 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (Environment.GetEnvironmentVariable("PORT") != null)
+{
+    // If running on Railway/Cloud, use /tmp to ensure we have write permissions
+    connectionString = "Data Source=/tmp/glasscollector.db";
+}
+
 builder.Services.AddDbContext<GlassCollectorDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlite(connectionString));
 
 builder.Services.AddSingleton<RouteOptimizationService>();
 builder.Services.AddScoped<CollectionService>();
@@ -38,10 +45,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-if (!app.Environment.IsDevelopment())
-{
-    app.UseHttpsRedirection();
-}
+// Removed HttpsRedirection to prevent 502 infinite redirect loops on Railway proxy
 app.UseCors("AllowAll");
 app.MapControllers();
 
