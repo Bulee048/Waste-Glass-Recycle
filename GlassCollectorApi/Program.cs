@@ -13,6 +13,8 @@ if (Environment.GetEnvironmentVariable("PORT") != null)
 {
     // If running on Railway/Cloud, use /tmp to ensure we have write permissions
     connectionString = "Data Source=/tmp/glasscollector.db";
+    var port = Environment.GetEnvironmentVariable("PORT");
+    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 }
 
 builder.Services.AddDbContext<GlassCollectorDbContext>(options =>
