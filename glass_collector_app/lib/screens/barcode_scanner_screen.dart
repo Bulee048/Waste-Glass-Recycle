@@ -38,6 +38,41 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
     }
   }
 
+  Future<void> _showManualEntryDialog() async {
+    final TextEditingController controller = TextEditingController();
+    final value = await showDialog<String>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Manual Entry'),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(
+              hintText: 'Enter barcode (e.g., SUP001)',
+            ),
+            autofocus: true,
+            textCapitalization: TextCapitalization.characters,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, controller.text.trim()),
+              child: const Text('Submit'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (value != null && value.isNotEmpty) {
+      if (!mounted) return;
+      Navigator.of(context).pop(value);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,6 +81,13 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
         title: const Text('Scan Barcode'),
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit),
+            tooltip: 'Enter Manually',
+            onPressed: _showManualEntryDialog,
+          ),
+        ],
       ),
       body: Stack(
         fit: StackFit.expand,
@@ -53,7 +95,7 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
           MobileScanner(
             controller: _controller,
             onDetect: _onDetect,
-            errorBuilder: (context, error, child) {
+            errorBuilder: (BuildContext context, MobileScannerException error, Widget? child) {
               return Center(
                 child: Padding(
                   padding: const EdgeInsets.all(24.0),
@@ -63,16 +105,16 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
                       const Icon(Icons.error_outline, color: Colors.red, size: 48),
                       const SizedBox(height: 16),
                       Text(
-                        'Camera initialization failed.',
+                        'Camera error or emulator detected.',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.white),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'If using BlueStacks or an emulator, ensure the camera is configured in settings. Error details:\n${error.errorCode.name}',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white70),
-                        textAlign: TextAlign.center,
-                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton.icon(
+                        onPressed: _showManualEntryDialog,
+                        icon: const Icon(Icons.keyboard),
+                        label: const Text('Enter Barcode Manually'),
+                      )
                     ],
                   ),
                 ),
@@ -83,12 +125,23 @@ class _BarcodeScannerScreenState extends State<BarcodeScannerScreen> {
             alignment: Alignment.bottomCenter,
             child: Padding(
               padding: const EdgeInsets.all(24),
-              child: Text(
-                'Align the Code 128 barcode within the frame',
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Colors.white,
-                    ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Align the Code 128 barcode within the frame',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: Colors.white,
+                        ),
+                  ),
+                  const SizedBox(height: 16),
+                  TextButton.icon(
+                    onPressed: _showManualEntryDialog,
+                    icon: const Icon(Icons.edit, color: Colors.white),
+                    label: const Text('Or tap here to type manually', style: TextStyle(color: Colors.white)),
+                  )
+                ],
               ),
             ),
           ),
