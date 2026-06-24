@@ -22,7 +22,7 @@ class ApiService {
 
   /// Android emulator: `10.0.2.2` maps to the host machine's `localhost`.
   /// Physical device on the same Wi‑Fi: use your PC's LAN IP, e.g. `http://192.168.1.42:5000`.
-  static const String apiBaseUrl = 'http://10.0.2.2:5000';
+  static const String apiBaseUrl = 'https://waste-glass-recycle-production.up.railway.app';
 
   final Dio _dio;
 
