@@ -1,0 +1,12 @@
+bin/
+obj/
+*.user
+.vs/
+.vscode/
+.dart_tool/
+.packages
+build/
+.pub-cache/
+.pub/
+*.sqlite
+*.db
